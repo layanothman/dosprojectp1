@@ -8,10 +8,9 @@ A distributed online bookstore system built with Node.js and Docker as part of t
 
 ---
 
-EADME.md
-```
 
-## 🚀 Getting Started
+
+##  Getting Started
 
 ### 1. Clone the Repository
 ```bash
