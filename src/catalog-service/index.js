@@ -7,7 +7,8 @@ const cors = require("cors")
 const redis = require('redis');
 const util = require("util")
 
-const client = redis.createClient(6379,"redis");
+const client = redis.createClient({ url: 'redis://localhost:6379' });
+
 client.set = util.promisify(client.set);
 client.get = util.promisify(client.get);
 
@@ -50,17 +51,18 @@ db.all(`SELECT * FROM items WHERE id = ?`, [searchId], (err, row) => {
         
         const remainingAmount = orderCost - orderPrice;
         db.run(
-          `UPDATE items SET quantity = ? WHERE id = ?`,
-          [numberOfItems, searchId],
-          function (err) {
-            if (err) {
-              console.error('Error updating record:', err.message);
-              return;
-            }
-            
-          }
-          
-        );
+  `UPDATE items SET quantity = ? WHERE id = ?`,
+  [numberOfItems, searchId],
+  async function (err) {
+    if (err) {
+      console.error('Error updating record:', err.message);
+      return;
+    }
+
+    await client.del(`${searchId}`);
+    await client.del(`${row[0].bookTopic}`); // Invalidate search cache too
+  }
+);
       }
       
       
@@ -105,15 +107,15 @@ db.serialize(() => {
   db.run(
     `CREATE TABLE IF NOT EXISTS items (
     id INTEGER PRIMARY KEY ,  
-    bookTopic TEXT,
-    numberOfItems INTEGER ,
-    bookCost INTEGER,  
-    bookTitle TEXT
+    topic TEXT,
+    quantity INTEGER ,
+    price INTEGER,  
+    title TEXT
   )`
   );
   // db.run(
   //   // i used INSERT OR REPLACE for nodemon
-  //   'INSERT OR REPLACE INTO items (id, bookTopic , numberOfItems, bookCost , bookTitle) VALUES (?, ?, ?, ?,?)',
+  //   'INSERT OR REPLACE INTO items (id, topic , quantity, price , title ) VALUES (?, ?, ?, ?,?)',
   //   [1,"Distributed System", 1000, 3000, 'How to get a good grade in DOS in 40 minutes a day']
   // );
   // [1,"Distributed System", 1000, 3000, 'How to get a good grade in DOS in 40 minutes a day']
@@ -121,16 +123,16 @@ db.serialize(() => {
   // [4,"Undergraduate School", 21, 900, 'Cooking for the Impatient Undergrad']
 });
 
-app.get('/search/:bookTopic',async (req, res) => {
-  let bookTopic = req.params.bookTopic.trim();
-  console.log(bookTopic);
-  const cachedPost = await client.get(`${bookTopic}`)
+app.get('/search/:topic',async (req, res) => {
+  let topic = req.params.topic.trim();
+  console.log(topic);
+  const cachedPost = await client.get(`${topic}`)
   console.log(cachedPost,"---")
   if(cachedPost){
     return res.json(JSON.parse(cachedPost))
   }
   db.serialize(() => {
-    db.all(`SELECT * FROM items WHERE bookTopic="${bookTopic}"`, (err, row) => {
+    db.all(`SELECT * FROM items WHERE topic="${topic}"`, (err, row) => {
       if (err) {
         console.log(err);
         return;
@@ -138,14 +140,14 @@ app.get('/search/:bookTopic',async (req, res) => {
       for (i = 0; i < row.length; i++) {
         console.log(
           row[i].id,
-          row[i].numberOfItems,
-          row[i].bookCost,
-          row[i].bookTopic
+          row[i].quantity,
+          row[i].price,
+          row[i].topic
         );
        
       }
 
-      client.set(`${bookTopic}`,JSON.stringify(row))
+      client.set(`${topic}`,JSON.stringify(row))
       // console.log(row);
       res.send({items:row});
     });
@@ -167,9 +169,9 @@ app.get('/info/:id',async (req, res) => {
       }
       if(cachedPost){
         let temp = JSON.parse(cachedPost)
-        console.log(row[0].numberOfItems,"--")
-        console.log(temp.numberOfItems,"--")
-        if(row[0].numberOfItems == temp.numberOfItems)
+        console.log(row[0].quantity,"--")
+        console.log(temp.quantity,"--")
+        if(row[0].quantity == temp.quantity)
           return res.json(JSON.parse(cachedPost))
         else{
           client.del(`${id}`)
