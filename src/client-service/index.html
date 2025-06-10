@@ -1,53 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bazar Bookstore - Client Service</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js" integrity="sha512-WrdC3CE9vf1nBf58JHepuWT4x24uTacky9fuzw2g/3L9JkihgwZ6Cfv+JGTtNyosOhEmttMtEZ6H3qJWfI7gIQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    input {
-      margin: 5px 0;
-      padding: 8px;
-      width: 300px;
-    }
-    button {
-      margin: 10px 10px 0 0;
-      padding: 10px 20px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js" integrity="sha512-WrdC3CE9vf1nBf58JHepuWT4x24uTacky9fuzw2g/3L9JkihgwZ6Cfv+JGTtNyosOhEmttMtEZ6H3qJWfI7gIQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
+    <input type="text" id="id" placeholder="id">
+    <input type="text" id="cost" placeholder="cost"><br>
+    <input type="text" id="topic" placeholder="topic"><br>
+    <br>
+<button id="purchase">Purchase </button>
+<button id="search">Search book</button>
+<button id="info">Book Info</button>
 
-  <h1>Bazar Bookstore - Client Interface</h1>
-
-  <div>
-    <label for="id">Book ID:</label><br />
-    <input type="text" id="id" placeholder="Enter book ID" />
-  </div>
-
-  <div>
-    <label for="cost">Cost:</label><br />
-    <input type="text" id="cost" placeholder="Enter amount to pay" />
-  </div>
-
-  <div>
-    <label for="topic">Topic:</label><br />
-    <input type="text" id="topic" placeholder="Enter book topic" />
-  </div>
-
-  <div>
-    <button id="purchase">Purchase</button>
-    <button id="search">Search Book</button>
-    <button id="info">Book Info</button>
-  </div>
-
-  <script src="index.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>

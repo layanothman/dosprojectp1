@@ -40,9 +40,9 @@ db.all(`SELECT * FROM items WHERE id = ?`, [searchId], (err, row) => {
     }
     
     if (!!row[0]) {
-      numberIt = row[0].quantity;
-      orderPrice = row[0].price;
-      let numberOfItems = row[0].quantity-1;
+      numberIt = row[0].numberOfItems;
+      orderPrice = row[0].bookCost;
+      let numberOfItems = row[0].numberOfItems-1;
       console.log(orderPrice)
       console.log(orderCost)
       
@@ -50,7 +50,7 @@ db.all(`SELECT * FROM items WHERE id = ?`, [searchId], (err, row) => {
         
         const remainingAmount = orderCost - orderPrice;
         db.run(
-          `UPDATE items SET quantity = ? WHERE id = ?`,
+          `UPDATE items SET numberOfItems = ? WHERE id = ?`,
           [numberOfItems, searchId],
           function (err) {
             if (err) {
@@ -76,14 +76,14 @@ db.all(`SELECT * FROM items WHERE id = ?`, [searchId], (err, row) => {
         if(updatedRow.length != 0){
           // console.log(updatedRow[0],"eeee")
           test = { numberOfItemsBeforeUpdate:numberIt,data: updatedRow}
-          if(numberIt === updatedRow[0].quantity){
+          if(numberIt === updatedRow[0].numberOfItems){
             lastResult = false
           }
           else{
             lastResult = true
           
           }
-          lastText = `Bought book ${updatedRow[0].title}`
+          lastText = `Bought book ${updatedRow[0].bookTitle}`
         }
         // console.log(test)
         if(lastResult)
@@ -160,7 +160,7 @@ app.get('/info/:id',async (req, res) => {
   /////////////////////////////
   db.serialize(() => {
     // i used serialize to solve of close data base for data displayed completely
-    db.all(`SELECT id,quantity,price FROM items WHERE id=${id}`,async (err, row) => {
+    db.all(`SELECT id,numberOfItems,bookCost FROM items WHERE id=${id}`,async (err, row) => {
       if (err) {
         console.log(err);
         return;
@@ -197,7 +197,7 @@ app.get('/info/:id',async (req, res) => {
 // })
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http://127.0.0.1:${port}`);
 });
 
 
